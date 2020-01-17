@@ -7,6 +7,8 @@ export default class Main extends Component {
     //javendo uma alteração o método render() irá ser executado automaticamente
     state = {
         products: [],
+        productInfo: {},
+        page: 1,
     }
 
     //Método sempre invocado na inicialização do componente
@@ -16,13 +18,33 @@ export default class Main extends Component {
 
     //Método criado pelo programador deve ser sempre com arrow functions
     //caso não seja feito não teremos o acesso às variaveis 'this' lá dentro.
-    loadProducts = async () => {
-        const response = await api.get('/products');
-        this.setState({ products: response.data.docs })
+    loadProducts = async (page = 1) => {
+        const response = await api.get(`/products?page=${page}`);
+        const { docs, ...productInfo } = response.data;
+
+        this.setState({ products: docs, productInfo, page })
+    }
+
+    nextPage = () => {
+        const { page, productInfo } = this.state;
+
+        if(page === productInfo.pages) return;
+
+        const pageNumber = page + 1;
+        this.loadProducts(pageNumber);  
+    }
+
+    prevPage = () => {
+        const { page } = this.state;
+
+        if(page === 1) return;
+
+        const pageNumber = page - 1;
+        this.loadProducts(pageNumber);  
     }
 
     render() {
-        const { products } = this.state;
+        const { products, page, productInfo } = this.state;
         return (
             <div className="product-list">
                 { products.map(product => (
@@ -32,6 +54,10 @@ export default class Main extends Component {
                         <a href="www.uol.com.br">Acessar</a>
                     </article>
                 ))}
+                <div className="actions">
+                    <button disabled={page===1} onClick={this.prevPage}>Anterior</button>
+                    <button disabled={productInfo.pages === page} onClick={this.nextPage}>Próxima</button>
+                </div>
             </div>
         )
     }
