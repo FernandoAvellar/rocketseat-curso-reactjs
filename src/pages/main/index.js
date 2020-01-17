@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import api from "../../services/api"
+import "./styles.css"
 
 export default class Main extends Component {
     //Todas variaveis criadas aqui dentro são monitoradas pelo componente
@@ -17,15 +18,19 @@ export default class Main extends Component {
     //caso não seja feito não teremos o acesso às variaveis 'this' lá dentro.
     loadProducts = async () => {
         const response = await api.get('/products');
-        console.log(response.data.docs);
         this.setState({ products: response.data.docs })
     }
 
     render() {
+        const { products } = this.state;
         return (
             <div className="product-list">
-                {this.state.products.map(product => (
-                    <h2 key={product._id}> {product.title} </h2>
+                { products.map(product => (
+                    <article key={product._id}>
+                        <strong>{product.title}</strong>
+                        <p>{product.description}</p>
+                        <a href="www.uol.com.br">Acessar</a>
+                    </article>
                 ))}
             </div>
         )
